@@ -1,6 +1,6 @@
 REST API - Weather Details
 
-Database information : daily.csv file was save in sqlite database(weather.db) and data is retrived by querying the database.
+Database information : daily.csv file has been saved in in table weather inside sqlite database weather.db and data is retrived by querying the database.
 
 Functions implemented are as below :
 
@@ -34,3 +34,4 @@ Validations done are as below:
 3. If user tries to insert data for date whose data is not available, program will insert data for that date and if data is already present, it will update the data with 201 HTTP code.   
 4. If user tries to insert some invalid values(alphabets), it will throw HTTP 400 - Bad Request error.   
 5. If user tries to delete data for date not present, it will throw HTTP 400 - Bad Request error.   
+6. The program provides consistent data everytime.   
