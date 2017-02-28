@@ -9,8 +9,8 @@ End Point : /historical
 Web URL : http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/historical   
 
 2. To get all the data for a particular date:   
-End Point : /historical/<YYYYMMDD>   
-Web URL : http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/historical/<YYYYMMDD>   
+End Point : /historical/YYYYMMDD   
+Web URL : http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/historical/YYYYMMDD   
 ex: http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/historical/20160302   
 
 3. To insert or update data for a particular date:   
