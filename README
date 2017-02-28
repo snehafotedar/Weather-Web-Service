@@ -1,5 +1,7 @@
 REST API - Weather Details
 
+daily.csv file was save in sqlite database(weather.db) and data is retrived by querying the database.
+
 Functions implemented are as below :
 
 1. To get all the historical data available:
@@ -27,5 +29,4 @@ Validations done are as below:
 3. If user tries to insert data for date whose data is not available, program will insert data for that date and if data is already present, it will update the data with 201 HTTP code.
 4. If user tries to insert some invalid values(alphabets), it will throw HTTP 400 - Bad Request error.
 5. If user tries to delete data for date not present, it will throw HTTP 400 - Bad Request error.
-6. For forecast, if user tries to enter the date which is not available, it will throw HTTP 400 - BAd Request error.
 
