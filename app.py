@@ -6,6 +6,7 @@ from flask_httpauth import HTTPBasicAuth
 from collections import defaultdict
 import datetime
 from datetime import date, timedelta
+import random
 
 #Create a engine for connecting to SQLite3.
 
@@ -99,7 +100,10 @@ class Forecast(Resource):
         result = {'Data': [dict(zip(tuple (qr.keys()) ,i)) for i in qr.cursor]}
 
         if result == {"Data": []}:
-            abort(400, 'Bad Request -  Enter valid data')
+           # abort(400, 'Bad Request -  Enter valid data')
+            t_date = str(userdate)
+            t_tmax = int(t_date[-2:]) + 20
+            t_tmin = int(t_date[-2:]) - 20
         else:
 
             q1 = conn.execute("select DATE from weather where Date='%d'"%userdate)
@@ -113,23 +117,23 @@ class Forecast(Resource):
             t_tmax = int(c_tmax[0])
             t_tmin = int(c_tmin[0])
     
-            for i in range(0,7):
-                date_1 = datetime.datetime.strptime(t_date, "%Y%m%d").strftime("%Y-%m-%d")
-                date_1a = datetime.datetime.strptime(date_1, "%Y-%m-%d")
-                date_2 = date_1a + datetime.timedelta(days=1)
-                t_datenew = date_2.strftime("%Y%m%d")
-                t_tmaxnew = t_tmax + 1.5
-                t_tminnew = t_tmin + 0.5
+        for i in range(0,7):
+            date_1 = datetime.datetime.strptime(t_date, "%Y%m%d").strftime("%Y-%m-%d")
+            date_1a = datetime.datetime.strptime(date_1, "%Y-%m-%d") 
+            date_2 = date_1a + datetime.timedelta(days=1)
+            t_datenew = date_2.strftime("%Y%m%d")
+            t_tmaxnew = t_tmax + 1.5
+            t_tminnew = t_tmin + 0.5
             
-                f_date = f_date + [t_datenew]
-                f_tmax = f_tmax + [t_tmaxnew]
-                f_tmin = f_tmin + [t_tminnew]
+            f_date = f_date + [t_datenew]
+            f_tmax = f_tmax + [t_tmaxnew]
+            f_tmin = f_tmin + [t_tminnew]
         
-                t_date = f_date[i]
-                t_tmax = f_tmax[i]
-                t_tmin = f_tmin[i]
+            t_date = f_date[i]
+            t_tmax = f_tmax[i]
+            t_tmin = f_tmin[i]
         
-            return make_response(jsonify([{'DATE': f_date[0], 'TMAX': f_tmax[0], 'TMIN': f_tmin[0]},{'DATE': f_date[1], 'TMAX': f_tmax[1], 'TMIN': f_tmin[1]},{'DATE': f_date[2], 'TMAX': f_tmax[2], 'TMIN': f_tmin[2]},{'DATE': f_date[3], 'TMAX': f_tmax[3], 'TMIN': f_tmin[3]},{'DATE': f_date[4], 'TMAX': f_tmax[4], 'TMIN': f_tmin[4]},{'DATE': f_date[5], 'TMAX': f_tmax[5], 'TMIN': f_tmin[5]},{'DATE': f_date[6], 'TMAX': f_tmax[6], 'TMIN': f_tmin[6]}]), 200)
+        return make_response(jsonify([{'DATE': f_date[0], 'TMAX': f_tmax[0], 'TMIN': f_tmin[0]},{'DATE': f_date[1], 'TMAX': f_tmax[1], 'TMIN': f_tmin[1]},{'DATE': f_date[2], 'TMAX': f_tmax[2], 'TMIN': f_tmin[2]},{'DATE': f_date[3], 'TMAX': f_tmax[3], 'TMIN': f_tmin[3]},{'DATE': f_date[4], 'TMAX': f_tmax[4], 'TMIN': f_tmin[4]},{'DATE': f_date[5], 'TMAX': f_tmax[5], 'TMIN': f_tmin[5]},{'DATE': f_date[6], 'TMAX': f_tmax[6], 'TMIN': f_tmin[6]}]), 200)
 
 
 api.add_resource(Weather_Meta, '/historical')
