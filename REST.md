@@ -24,7 +24,7 @@ Web URL : http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/historic
 ex: http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/historical/delete/20160302    
 
 5. To predict data for next 7 days:   
-End Point : /forecast/YYYYMMDD
+End Point : /forecast/YYYYMMDD    
 Web URL : http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/forecast/YYYYMMDD   
 ex: http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/forecast/20170102   
 
