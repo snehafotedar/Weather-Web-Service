@@ -14,18 +14,18 @@ Web URL : http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/historic
 ex: http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/historical/20160302   
 
 3. To insert or update data for a particular date:   
-End Point : /historical/<YYYYMMDD,Tmax,Tmin>   
-Web URL : http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/historical/<YYYYMMDD,Tmax,Tmin>   
+End Point : /historical/YYYYMMDD,Tmax,Tmin   
+Web URL : http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/historical/YYYYMMDD,Tmax,Tmin   
 ex: http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/historical/20160302,40,27   
 
 4. To delete data for a particular date:   
-End Point : /historical/delete/<YYYYMMDD>   
-Web URL : http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/historical/delete/<YYYYMMDD>   
+End Point : /historical/delete/YYYYMMDD   
+Web URL : http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/historical/delete/YYYYMMDD   
 ex: http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/historical/delete/20160302    
 
 5. To predict data for next 7 days:   
-End Point : /forecast/<YYYYMMDD>
-Web URL : http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/forecast/<YYYYMMDD>   
+End Point : /forecast/YYYYMMDD
+Web URL : http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/forecast/YYYYMMDD   
 ex: http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/forecast/20170102   
 
 Validations done are as below:   
