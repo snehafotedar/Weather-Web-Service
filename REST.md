@@ -1,6 +1,6 @@
 REST API - Weather Details
 
-Database information : daily.csv file has been saved in in table weather inside sqlite database weather.db and data is retrived by querying the database.
+Database information : daily.csv file has been saved in table weather inside sqlite database weather.db and data is retrived by querying the database.
 
 Functions implemented are as below :
 
