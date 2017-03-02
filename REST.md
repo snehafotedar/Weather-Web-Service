@@ -1,11 +1,11 @@
-#**REST API - Weather Details**
+#**Homework 2 - Weather ReSTful WebService**
 
 **Database information :** daily.csv file has been saved in table weather inside sqlite database weather.db and data is retrived by querying the database.
 
-Functions implemented are as below :
+**Functions implemented are as below :**
 
 1. To get all the historical data available:   
-End Point : /historical   
+*End Point : /historical*   
 Web URL : http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/historical   
 
 2. To get all the data for a particular date:   
