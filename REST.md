@@ -35,3 +35,7 @@ Example: http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/forecast/
 4. If user tries to insert some invalid values(alphabets), it will throw HTTP 400 - Bad Request error.   
 5. If user tries to delete data for date not present, it will throw HTTP 400 - Bad Request error.   
 6. The program provides consistent data everytime.   
+
+**References:**   
+1. https://impythonist.wordpress.com/2015/07/12/build-an-api-under-30-lines-of-code-with-python-and-flask/   
+2. https://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask 
