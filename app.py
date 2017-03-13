@@ -4,9 +4,9 @@ from sqlalchemy import create_engine
 from json import dumps
 from flask_httpauth import HTTPBasicAuth
 from collections import defaultdict
-import datetime
+import datetime, requests
 from datetime import date, timedelta
-import random
+import random, ast, json
 
 #Create a engine for connecting to SQLite3.
 
@@ -17,7 +17,6 @@ api = Api(app)
 
 @app.errorhandler(404)
 def not_found(error):
-    #response = jsonify({'message': error.description})
     return make_response(jsonify({'message': error.description}),404)
 
 @app.errorhandler(404)
@@ -28,7 +27,6 @@ def not_found(error):
 def not_found(error):
     return make_response(jsonify({'message': error.description}),400)
 
-
 class Weather_Meta(Resource):
     def get(self):
         #Connect to databse
@@ -36,59 +34,64 @@ class Weather_Meta(Resource):
     
         #Perform query and return JSON data
         query = conn.execute("select DATE from weather")
-        result = {'Data': [dict(zip(tuple (query.keys()) ,i)) for i in query.cursor]}
+        result = [dict(zip(tuple (query.keys()) ,i)) for i in query.cursor]
         
-        if result == {"Data": []}:
+        if result == []:
             abort(404, 'Not Found')
         else:
-            return result
+            return make_response(jsonify(result),200)
 
 
 class Weather_Date(Resource):
     def get(self, userdate):
         conn = e.connect()
-        query = conn.execute("select * from weather where Date='%s'"%userdate)
-        
+        query = conn.execute("select DATE, TMAX, TMIN from weather where Date='%s'"%userdate)
         #Query the result and get cursor.Dumping that data to a JSON is looked by extension
-        result = {'Data': [dict(zip(tuple (query.keys()) ,i)) for i in query.cursor]}
+        result = [dict(zip(tuple (query.keys()) ,i)) for i in query.cursor]
     
-        if result == {"Data": []}:
+        if result == []:
             abort(404, 'Not Found')
         else:
-            return result
+            r = ast.literal_eval(json.dumps(result))
+            res = ", ".join(repr(e) for e in r)
+            res = eval(res)
+
+            return make_response(jsonify(res),200)
     
 class Delete_Date(Resource):
-    def get(self, userdate):
+    def delete(self, userdate):
         conn = e.connect()
         qr = conn.execute("select * from weather where Date='%s'"%userdate)
-        result = {'Data': [dict(zip(tuple(qr.keys()) , i)) for i in qr.cursor]}
+        result = [dict(zip(tuple(qr.keys()) , i)) for i in qr.cursor]
 
-        if result == {"Data": []}:
+        if result == []:
             abort(400, 'Bad Request -  Enter valid data')
         else:
             query = conn.execute("delete from weather where Date='%s'"%userdate)
 
             #Query the result and get cursor.Dumping that data to a JSON is looked by extension
-            return make_response(jsonify({'Data deleted for': userdate}), 200) 
+            return make_response(jsonify({'Data deleted for': userdate}), 204) 
 
-class Insert_Date(Resource):
-    def get(self, userdate, tmpmax, tmpmin):
+@app.route('/historical/', methods=['POST'])
+def post():
         conn = e.connect()
-        if userdate.isnumeric() and tmpmax.isnumeric() and tmpmin.isnumeric():
-            qr = conn.execute("select * from weather where Date='%s'"%userdate)
-            result = {'Data': [dict(zip(tuple (qr.keys()) ,i)) for i in qr.cursor]}
 
-            if result == {"Data": []}:
-                query = conn.execute("insert into weather(DATE,TMAX,TMIN) values (?,?,?)",(userdate,tmpmax,tmpmin))
-            else:
-                query = conn.execute("update weather set TMAX=?,TMIN=? where Date=?",(tmpmax,tmpmin,userdate))
-            #Query the result and get cursor.Dumping that data to a JSON is looked by extension
-            return make_response(jsonify({'DATE': userdate}), 201)
+        data = request.data
+        data = ast.literal_eval(data)
 
+        tmpmax = data['TMAX']
+        tmpmin = data['TMIN']
+        userdate = data['DATE']
+
+        qr = conn.execute("select * from weather where Date='%s'"%userdate)
+        result = [dict(zip(tuple (qr.keys()) ,i)) for i in qr.cursor]
+
+        if result == []:
+            query = conn.execute("insert into weather(DATE,TMAX,TMIN) values (?,?,?)",(userdate,tmpmax,tmpmin))
         else:
-            abort(400, 'Bad Request- Enter valid data')
-        #Query the result and get cursor.Dumping that data to a JSON is looked by extension
-        #return make_response(jsonify({'DATE': userdate}), 201)
+            query = conn.execute("update weather set TMAX=?,TMIN=? where Date=?",(tmpmax,tmpmin,userdate))
+            #Query the result and get cursor.Dumping that data to a JSON is looked by extension
+        return make_response(jsonify({'DATE': userdate}), 201)
 
 class Forecast(Resource):
     def get(self, userdate):
@@ -100,7 +103,6 @@ class Forecast(Resource):
         result = {'Data': [dict(zip(tuple (qr.keys()) ,i)) for i in qr.cursor]}
 
         if result == {"Data": []}:
-           # abort(400, 'Bad Request -  Enter valid data')
             t_date = str(userdate)
             t_tmax = int(t_date[-2:]) + 20
             t_tmin = int(t_date[-2:]) - 20
@@ -114,10 +116,26 @@ class Forecast(Resource):
             c_tmax = q2.cursor.fetchone()
             c_tmin = q3.cursor.fetchone()
             t_date = str(c_date[0]) 
-            t_tmax = int(c_tmax[0])
-            t_tmin = int(c_tmin[0])
+            t_tmax = float(c_tmax[0])
+            t_tmin = float(c_tmin[0])
+
+        date_1 = datetime.datetime.strptime(t_date, "%Y%m%d").strftime("%Y-%m-%d")
+        date_1a = datetime.datetime.strptime(date_1, "%Y-%m-%d")
     
-        for i in range(0,7):
+        t_datenew = date_1a.strftime("%Y%m%d")
+        t_tmaxnew = t_tmax + 1.5
+        t_tminnew = t_tmin + 0.5
+
+        f_date = f_date + [t_datenew]
+        f_tmax = f_tmax + [t_tmaxnew]
+        f_tmin = f_tmin + [t_tminnew]
+
+        t_date = f_date[0]
+        t_tmax = f_tmax[0]
+        t_tmin = f_tmin[0]
+
+    
+        for i in range(1,7):
             date_1 = datetime.datetime.strptime(t_date, "%Y%m%d").strftime("%Y-%m-%d")
             date_1a = datetime.datetime.strptime(date_1, "%Y-%m-%d") 
             date_2 = date_1a + datetime.timedelta(days=1)
@@ -133,13 +151,13 @@ class Forecast(Resource):
             t_tmax = f_tmax[i]
             t_tmin = f_tmin[i]
         
-        return make_response(jsonify([{'DATE': f_date[0], 'TMAX': f_tmax[0], 'TMIN': f_tmin[0]},{'DATE': f_date[1], 'TMAX': f_tmax[1], 'TMIN': f_tmin[1]},{'DATE': f_date[2], 'TMAX': f_tmax[2], 'TMIN': f_tmin[2]},{'DATE': f_date[3], 'TMAX': f_tmax[3], 'TMIN': f_tmin[3]},{'DATE': f_date[4], 'TMAX': f_tmax[4], 'TMIN': f_tmin[4]},{'DATE': f_date[5], 'TMAX': f_tmax[5], 'TMIN': f_tmin[5]},{'DATE': f_date[6], 'TMAX': f_tmax[6], 'TMIN': f_tmin[6]}]), 200)
+        result = make_response(jsonify([{'DATE': f_date[0], 'TMAX': f_tmax[0], 'TMIN': f_tmin[0]},{'DATE': f_date[1], 'TMAX': f_tmax[1], 'TMIN': f_tmin[1]},{'DATE': f_date[2], 'TMAX': f_tmax[2], 'TMIN': f_tmin[2]},{'DATE': f_date[3], 'TMAX': f_tmax[3], 'TMIN': f_tmin[3]},{'DATE': f_date[4], 'TMAX': f_tmax[4], 'TMIN': f_tmin[4]},{'DATE': f_date[5], 'TMAX': f_tmax[5], 'TMIN': f_tmin[5]},{'DATE': f_date[6], 'TMAX': f_tmax[6], 'TMIN': f_tmin[6]}]), 200)
 
+        return result
 
-api.add_resource(Weather_Meta, '/historical')
+api.add_resource(Weather_Meta, '/historical/')
 api.add_resource(Weather_Date, '/historical/<string:userdate>')
-api.add_resource(Delete_Date, '/historical/delete/<string:userdate>')
-api.add_resource(Insert_Date, '/historical/<string:userdate>,<string:tmpmax>,<string:tmpmin>')
+api.add_resource(Delete_Date, '/historical/<string:userdate>')
 api.add_resource(Forecast, '/forecast/<int:userdate>')
 
 if __name__ == '__main__':
