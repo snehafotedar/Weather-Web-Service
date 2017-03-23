@@ -1,0 +1,541 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <style>
+body {font-family: "Lato", sans-serif;}
+
+/* Style the tab */
+div.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+div.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+div.tab button:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+div.tab button.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+</style>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script> 
+    <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.0/bootstrap-table.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+     google.charts.load('current', {packages: ['corechart','line']});  
+   </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.0/bootstrap-table.min.css" rel="stylesheet" type="text/css" />
+    <script language="javascript">
+   
+    $(document).ready(function(){
+	$('#userdate').on('input', function() {
+        	var nFilled = $('#userdate').filter(function() {
+            		return $.trim( this.value ) !== '';
+        	}).length;
+	
+        	$('#bttnsubmit').prop('disabled', nFilled === 0);
+    	}).trigger('input');
+	
+	 $('#userdate2').on('input', function() {
+                var nFilled = $('#userdate2').filter(function() {
+                        return $.trim( this.value ) !== '';
+                }).length;
+                $('#bttnsubmit2').prop('disabled', nFilled === 0);
+        }).trigger('input');
+
+	 $('#userdate3').on('input', function() {
+                var nFilled = $('#userdate3').filter(function() {
+                        return $.trim( this.value ) !== '';
+                }).length;
+                $('#bttnsubmit3').prop('disabled', nFilled === 0);
+        }).trigger('input');
+
+	
+	$('#userdate4').on('input', function() {
+                var nFilled = $('#userdate4').filter(function() {
+                        return $.trim( this.value ) !== '';
+                }).length;
+                $('#bttnsubmit4').prop('disabled', nFilled === 0);
+        }).trigger('input');
+	
+	$('#tmax').on('input', function() {
+                var nFilled = $('#tmax').filter(function() {
+                        return $.trim( this.value ) !== '';
+                }).length;
+                $('#bttnsubmit4').prop('disabled', nFilled === 0);
+        }).trigger('input');
+	
+	$('#tmin').on('input', function() {
+                var nFilled = $('#tmin').filter(function() {
+                        return $.trim( this.value ) !== '';
+                }).length;
+                $('#bttnsubmit4').prop('disabled', nFilled === 0);
+        }).trigger('input');
+ 
+});
+    
+    function getdetails() {
+
+   	 var userdate = document.getElementById("userdate");
+	 console.log(userdate.value);
+	 var fromdate = userdate.value;
+	 var year = fromdate.substring(0,4);
+	 var month = fromdate.substring(5,7);
+	 var day = fromdate.substring(8,10);
+	 console.log(year);
+	 console.log(month);
+	 console.log(day);
+	 var todate = year+month+day;
+         var url = "http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/historical/" + todate;
+	
+         $.get(url, function(data, status){
+
+		var Mx = data['TMAX'];
+		var Mn = data['TMIN'];
+		var newdata = google.visualization.arrayToDataTable([
+        	["Element", "Temperature", { role: "style" } ],
+        	["Maximum", Mx, "red"],
+        	["Minimum", Mn, "blue"]
+      		]);
+
+      		var view = new google.visualization.DataView(newdata);
+      		view.setColumns([0, 1,
+                       { calc: "stringify",
+                         sourceColumn: 1,
+                         type: "string",
+                         role: "annotation" },
+                       2]);
+
+      		var options = {
+        		title: "Temperature",
+        		width: 600,
+        		height: 400,
+        		bar: {groupWidth: "50%"},
+        		legend: { position: "none" },
+      		};
+      		var chart = new google.visualization.ColumnChart(document.getElementById("columnchart_values"));
+		chart.draw(view, options);
+		
+	 }).fail(function(jqXHR, textStatus, errorThrown) {
+		if(jqXHR.status==404) {
+			 $("#gettmax").val("");
+	                 $("#gettmin").val("");
+                         $("#getval").html('Data Unavailable or Invalid Date');
+                }
+
+	});
+		console.log(status);
+    }
+
+    function reset() {
+                $("#userdate").val("");
+                $("#gettmax").val("");
+                $("#gettmin").val("");
+		$("#getval").html("");
+		$("#columnchart_values").html("");
+
+    }
+
+
+     function insreset() {
+                $("#userdate4").val("");
+                $("#tmax").val("");
+                $("#tmin").val("");
+		$("#ins").html("");
+
+    }
+
+     function delreset() {
+                $("#userdate2").val("");
+                $("#msg").html("");
+
+    }
+	
+     function forreset() {
+                $("#userdate3").val("");
+                $("#container").html("");
+
+    }
+
+
+    function gethistorical() {
+         
+         var url = "http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/historical/";
+	 var getdata;
+         $.get(url, function(data, status){
+        
+		getdata = JSON.stringify(data);
+                $("#hist").html(JSON.stringify(data));
+		 console.log(getdata);
+		 getdata = JSON.parse(getdata);
+		 console.log(getdata);
+		 $('#table').bootstrapTable({
+        	 //Assigning data to table
+		 undefinedText: 'n/a',
+             	 data: getdata
+          	});
+	});
+    }
+
+    function mainpage() {
+	window.location.href = "http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/";
+    }
+
+    function deletedata() {
+         var userdate2 = document.getElementById("userdate2");
+	 var fromdate = userdate2.value;
+         var year = fromdate.substring(0,4);
+         var month = fromdate.substring(5,7);
+         var day = fromdate.substring(8,10);
+         console.log(year);
+         console.log(month);
+         console.log(day);
+         var todate = year+month+day;
+
+         $.ajax({
+    		url: "http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/historical/" + todate,
+    		type: 'DELETE',
+    		success: function(result) {
+		 $("#msg").html('Data has been deleted');
+    			}
+		}); 
+    }
+
+
+    function insertdata() {
+         var userdate4 = document.getElementById("userdate4");
+	 var fromdate = userdate4.value;
+         var year = fromdate.substring(0,4);
+         var month = fromdate.substring(5,7);
+         var day = fromdate.substring(8,10);
+         console.log(year);
+         console.log(month);
+         console.log(day);
+         var todate = year+month+day;
+
+	 var tmax = document.getElementById("tmax");
+	 var tmin = document.getElementById("tmin");
+	 var insdata = '{"DATE":"'+todate+'","TMAX":'+tmax.value+',"TMIN":'+tmin.value+'}';
+         var url = "http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/historical/";
+	 console.log(insdata);
+	 console.log(typeof insdata);
+	 $.ajax({
+    		type : "POST",
+    		url : url,
+    		data: JSON.stringify(eval("(" + insdata + ")")),
+    		contentType: 'application/json;charset=UTF-8',
+    		success: function(result) {
+        	console.log(result);
+    		$("#ins").html('Data inserted');
+		}
+	});
+       
+    }
+
+     function getforecast() {
+         var userdate3 = document.getElementById("userdate3");
+	 var fromdate = userdate3.value;
+         var year = fromdate.substring(0,4);
+         var month = fromdate.substring(5,7);
+         var day = fromdate.substring(8,10);
+         console.log(year);
+         console.log(month);
+         console.log(day);
+         var todate = year+month+day;
+	
+         var url = "http://ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000/forecast/" + todate;
+	 var newdata = new google.visualization.DataTable();
+	 
+         $.get(url, function(data, status){
+       
+                $("#getfor").html(JSON.stringify(data));
+		console.log(data[0]["DATE"]);
+		day1 = data[0];
+		day2 = data[1];
+		newdata.addColumn('string', 'Month');
+   		newdata.addColumn('number', 'Maximum');
+   		newdata.addColumn('number', 'Minimum');
+   		newdata.addRows([
+			[data[0]["DATE"],  data[0]["TMAX"], data[0]["TMIN"]],
+			[data[1]["DATE"],  data[1]["TMAX"], data[1]["TMIN"]],
+			[data[2]["DATE"],  data[2]["TMAX"], data[2]["TMIN"]],
+			[data[3]["DATE"],  data[3]["TMAX"], data[3]["TMIN"]],
+			[data[4]["DATE"],  data[4]["TMAX"], data[4]["TMIN"]],
+			[data[5]["DATE"],  data[5]["TMAX"], data[5]["TMIN"]],
+			[data[6]["DATE"],  data[6]["TMAX"], data[6]["TMIN"]]
+   		]);
+		 var options = {'title' : 'Temperature forcast for next 7 days from the entered date',
+      	hAxis: {
+         	title: 'Days'
+      	},
+      	vAxis: {
+         	title: 'Temperature'
+      	},
+      	'width':700,
+      	'height':400,
+	pointsVisible: true
+   	};
+
+   	// Instantiate and draw the chart.
+   	var chart = new google.visualization.LineChart(document.getElementById('container'));
+   	chart.draw(newdata, options);
+
+         });
+	 
+     }
+     
+      function getforecastfrom() {
+         var userdate3 = document.getElementById("userdate3");
+         var fromdate = userdate3.value;
+         var year = fromdate.substring(0,4);
+         var month = fromdate.substring(5,7);
+         var day = fromdate.substring(8,10);
+         console.log(year);
+         console.log(month);
+         console.log(day);
+         var todate = year+month+day;
+
+	 var key = "82d9028525fde962";
+	 var zipcode = '45220';
+	 var url = 'http://api.wunderground.com/api/' + key + '/geolookup/forecast7day/q/' + zipcode + '.json';
+	 
+	 var xhr = new XMLHttpRequest();
+	 xhr.open('GET', url, false); 
+ 	 xhr.send(null);
+	 var response = JSON.parse(xhr.responseText);
+	 console.log(response['forecast']['simpleforecast']['forecastday'][1]);	
+	 	
+	 var day;
+	 var i;
+	 var F_Tmax = [];
+	 var F_Tmin = [];
+	 var data_date = [];
+	 for (i = 0;i<7;i++)  {
+
+	      day = response['forecast']['simpleforecast']['forecastday'][i];
+		console.log(day);
+              data_day = day['date']['day'];
+	      if (data_day < 10){ 
+		data_day = '0' + data_day.toString();}
+	      console.log(data_day);
+              data_month = day['date']['month'];
+	      if (data_month < 10){
+		data_month = '0' + data_month.toString();}
+                console.log(data_month);
+	      
+
+              data_year = day['date']['year'];
+		console.log(day['high']['fahrenheit']);
+              Tmax = day['high']['fahrenheit'];
+	      F_Tmax[i] = parseFloat(Tmax);
+		console.log(typeof F_Tmax[i]);
+              Tmin = day['low']['fahrenheit'];
+	      F_Tmin[i] = parseFloat(Tmin);
+              data_date[i] = data_year.toString()+data_month.toString()+data_day.toString();
+	      console.log(data_date[i]);
+	 }
+
+          var newdata = new google.visualization.DataTable();
+
+                newdata.addColumn('string', 'Days');
+                newdata.addColumn('number', 'Maximum');
+                newdata.addColumn('number', 'Minimum');
+                newdata.addRows([
+                        [data_date[0],  F_Tmax[0], F_Tmin[0]],
+			[data_date[1],  F_Tmax[1], F_Tmin[1]],
+			[data_date[2],  F_Tmax[2], F_Tmin[2]],
+			[data_date[3],  F_Tmax[3], F_Tmin[3]],
+			[data_date[4],  F_Tmax[4], F_Tmin[4]],
+			[data_date[5],  F_Tmax[5], F_Tmin[5]],
+			[data_date[6],  F_Tmax[6], F_Tmin[6]]
+                ]);
+                 var options = {'title' : 'Temperature forcast for next 7 days from today',
+        hAxis: {
+                title: 'Days'
+        },
+        vAxis: {
+                title: 'Temperature'
+        },
+        'width':700,
+        'height':400,
+	 pointsVisible: true
+        };
+
+        // Instantiate and draw the chart.
+        var chart = new google.visualization.LineChart(document.getElementById('container'));
+        chart.draw(newdata, options); 
+
+     }
+
+
+
+     </script>
+     </head>
+     <body style="background-color:#F0F8FF;">
+     <script>
+     function opentab(evt, cityName) {
+    	var i, tabcontent, tablinks;
+    	tabcontent = document.getElementsByClassName("tabcontent");
+    	for (i = 0; i < tabcontent.length; i++) {
+        	tabcontent[i].style.display = "none";
+    	}
+    	tablinks = document.getElementsByClassName("tablinks");
+    	for (i = 0; i < tablinks.length; i++) {
+        	tablinks[i].className = tablinks[i].className.replace(" active", "");
+    	}
+    	document.getElementById(cityName).style.display = "block";
+    	evt.currentTarget.className += " active";
+	}
+     </script>
+
+     <center>
+       <div class="form-style-8">
+	<h3 style="background: #2A88AD;padding: 20px 30px 15px 30px;margin: -30px -30px 30px -30px;border-radius: 10px 10px 0 0;-webkit-border-radius: 10px 10px 0 0;-moz-border-radius: 10px 10px 0 0;color: #fff;text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.12);font: normal 30px 'Bitter', serif;-moz-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);-webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);border: 10px solid #257C9E;">ReSTful Weather service </h3>
+     </center>
+
+	
+       	<div class="tab">
+  		<button class="tablinks" onclick="opentab(event, 'Historical')">Historical Data</button>
+  		<button class="tablinks" onclick="opentab(event, 'GetData')">Get Data</button>
+  		<button class="tablinks" onclick="opentab(event, 'Insert')">Insert Data</button>
+		<button class="tablinks" onclick="opentab(event, 'Delete')">Delete Data</button>
+		<button class="tablinks" onclick="opentab(event, 'Forecast')">Weather Forecast</button>
+	</div>
+
+	<div id="Historical" class="tabcontent">
+		</br>
+		<h5>Get list of dates for which data is available in the system</h5>
+		</br>
+		<input type="button" style="background: #2A88AD;padding: 8px 20px 8px 20px;border-radius: 5px;-webkit-border-radius: 5px;-moz-border-radius: 5px;color: #fff;text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.12);font: normal 30px 'Bitter', serif;-moz-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);-webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);border: 1px solid #257C9E;font-size: 15px;" value="View Historical Dates" onclick="gethistorical()"/>
+        	<input type="button" style="background: #2A88AD;padding: 8px 20px 8px 20px;border-radius: 5px;-webkit-border-radius: 5px;-moz-border-radius: 5px;color: #fff;text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.12);font: normal 30px 'Bitter', serif;-moz-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);-webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);border: 1px solid #257C9E;font-size: 15px;" value="Back to main page" onclick="mainpage()"/>
+
+	<!p id="hist"><!/p>
+	</br>
+	<table id="table">
+ 	  <thead>
+	    <tr>
+		<th data-field="DATE"></th>
+	    </tr>
+	  </thead>
+	</table>
+	</div>
+
+	<div id="GetData" class="tabcontent">
+	<label for="weather">Enter user date:</label>
+       	<input type="date" id="userdate" size="10" class="user-data" data-date-inline-picker="true"/>
+	</br>
+	</br>
+	 
+	<input type="button" id="bttnsubmit" class="submit-name" style="background: #2A88AD;padding: 8px 20px 8px 20px;border-radius: 5px;-webkit-border-radius: 5px;-moz-border-radius: 5px;color: #fff;text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.12);font: normal 30px 'Bitter', serif;-moz-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);-webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);border: 1px solid #257C9E;font-size: 15px;" value="Get temperature data" onclick="getdetails()"/>
+	&nbsp;
+	&nbsp;
+	<input type="button"  style="background: #2A88AD;padding: 8px 20px 8px 20px;border-radius: 5px;-webkit-border-radius: 5px;-moz-border-radius: 5px;color: #fff;text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.12);font: normal 30px 'Bitter', serif;-moz-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);-webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);border: 1px solid #257C9E;font-size: 15px;" value="Reset" onclick="reset()"/>
+	&nbsp;
+	&nbsp;
+	<input type="button"  style="background: #2A88AD;padding: 8px 20px 8px 20px;border-radius: 5px;-webkit-border-radius: 5px;-moz-border-radius: 5px;color: #fff;text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.12);font: normal 30px 'Bitter', serif;-moz-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);-webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);border: 1px solid #257C9E;font-size: 15px;" value="Back to main page" onclick="mainpage()"/>
+	</br>
+	</br>
+	<p id="getval"></p>
+	<div id="columnchart_values" style="width: 900px; height: 300px;"></div>
+        </br>
+	</div>
+	
+	 <div id="Delete" class="tabcontent">
+        <label for="weather">Enter user date:</label>
+        <input type="date" id="userdate2" size="10"   data-date-inline-picker="true"/>
+        </br>
+        </br>
+        <input type="button" id="bttnsubmit2"  style="background: #2A88AD;padding: 8px 20px 8px 20px;border-radius: 5px;-webkit-border-radius: 5px;-moz-border-radius: 5px;color: #fff;text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.12);font: normal 30px 'Bitter', serif;-moz-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);-webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);border: 1px solid #257C9E;font-size: 15px;" value="Delete" onclick="deletedata()"/>
+        &nbsp;
+        &nbsp;
+        <input type="button"  style="background: #2A88AD;padding: 8px 20px 8px 20px;border-radius: 5px;-webkit-border-radius: 5px;-moz-border-radius: 5px;color: #fff;text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.12);font: normal 30px 'Bitter', serif;-moz-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);-webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);border: 1px solid #257C9E;font-size: 15px;" value="Reset" onclick="delreset()"/>
+        &nbsp;
+        &nbsp;
+        <input type="button"  style="background: #2A88AD;padding: 8px 20px 8px 20px;border-radius: 5px;-webkit-border-radius: 5px;-moz-border-radius: 5px;color: #fff;text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.12);font: normal 30px 'Bitter', serif;-moz-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);-webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);border: 1px solid #257C9E;font-size: 15px;" value="Back to main page" onclick="mainpage()"/>
+        </br>
+        </br>
+
+	<p id="msg"></p>
+        </br>
+        </div>
+
+	<div id="Forecast" class="tabcontent">
+	
+        <label for="weather">Enter user date:</label>
+        <input type="date" id="userdate3" size="10" data-date-inline-picker="true"/>
+        </br>
+        </br>
+
+        <input type="button" id="bttnsubmit3"  style="background: #2A88AD;padding: 8px 20px 8px 20px;border-radius: 5px;-webkit-border-radius: 5px;-moz-border-radius: 5px;color: #fff;text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.12);font: normal 30px 'Bitter', serif;-moz-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);-webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);border: 1px solid #257C9E;font-size: 15px;" value="Get Forecast for User date" onclick="getforecast()"/>
+        &nbsp;
+	&nbsp;
+	<input type="button" id="bttnsubmit3a"  style="background: #2A88AD;padding: 8px 20px 8px 20px;border-radius: 5px;-webkit-border-radius: 5px;-moz-border-radius: 5px;color: #fff;text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.12);font: normal 30px 'Bitter', serif;-moz-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);-webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);border: 1px solid #257C9E;font-size: 15px;" value="Get Forecast from Wunderground.com" onclick="getforecastfrom()"/>
+
+	&nbsp;
+        &nbsp;
+        <input type="button"  style="background: #2A88AD;padding: 8px 20px 8px 20px;border-radius: 5px;-webkit-border-radius: 5px;-moz-border-radius: 5px;color: #fff;text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.12);font: normal 30px 'Bitter', serif;-moz-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);-webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);border: 1px solid #257C9E;font-size: 15px;" value="Reset" onclick="forreset()"/>
+        &nbsp;
+        &nbsp;
+        <input type="button"  style="background: #2A88AD;padding: 8px 20px 8px 20px;border-radius: 5px;-webkit-border-radius: 5px;-moz-border-radius: 5px;color: #fff;text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.12);font: normal 30px 'Bitter', serif;-moz-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);-webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);border: 1px solid #257C9E;font-size: 15px;" value="Back to main page" onclick="mainpage()"/>
+        </br>
+
+	</br>
+	<div id="container" style="width: 700px; height: 400px; margin: 0 auto"></div>
+        </div>
+
+
+	<div id="Insert" class="tabcontent">
+        <label>Enter user date:</label>
+        <input type="date" id="userdate4" size="10"  data-date-inline-picker="true"/>
+        </br>
+	</br>
+	<label>Enter Maximum Temperature:</label>
+        <input type="number" id="tmax" size="10"  placeholder="Value in Farenheit" required/>
+        </br>
+	</br>
+	<label>Enter Minimum Temperature:</label>
+        <input type="number" id="tmin" size="10"  placeholder="Value in Farenheit" required/>
+        </br>
+        </br>
+        <input type="button" id="bttnsubmit4"  style="background: #2A88AD;padding: 8px 20px 8px 20px;border-radius: 5px;-webkit-border-radius: 5px;-moz-border-radius: 5px;color: #fff;text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.12);font: normal 30px 'Bitter', serif;-moz-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);-webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);border: 1px solid #257C9E;font-size: 15px;" value="Insert Data" onclick="insertdata()"/>
+        &nbsp;
+        &nbsp;
+        <input type="button"  style="background: #2A88AD;padding: 8px 20px 8px 20px;border-radius: 5px;-webkit-border-radius: 5px;-moz-border-radius: 5px;color: #fff;text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.12);font: normal 30px 'Bitter', serif;-moz-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);-webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);border: 1px solid #257C9E;font-size: 15px;" value="Reset" onclick="insreset()"/>
+        &nbsp;
+        &nbsp;
+        <input type="button"  style="background: #2A88AD;padding: 8px 20px 8px 20px;border-radius: 5px;-webkit-border-radius: 5px;-moz-border-radius: 5px;color: #fff;text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.12);font: normal 30px 'Bitter', serif;-moz-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);-webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);border: 1px solid #257C9E;font-size: 15px;" value="Back to main page" onclick="mainpage()"/>
+	</br>
+	</br>
+	<p id="ins"></p>
+        </br>
+        </div>
+
+     </body>
+    </html>
+
