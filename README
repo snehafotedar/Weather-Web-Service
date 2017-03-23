@@ -1,3 +1,14 @@
 REST API - Weather Details
 
-Please read REST.md file for project information.
+Homework 3 - Upgrade UI to Dynamic Using Service API
+
+Application URL: ec2-52-41-156-167.us-west-2.compute.amazonaws.com:5000
+
+Functions implemented are as below :
+1. Get list of dates for which historical data is available
+2. Get Temperature data for a particular date.
+3. Insert temperature information for a particular date.
+4. Delete data for a particular date.
+5. Weather Forcast:
+  a. Get next 7 days forcast for the date user has entered.
+  b. get next 7 days forcast from today's date using a third party weather forcasting website - wunderground.com
